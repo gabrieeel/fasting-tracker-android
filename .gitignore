@@ -1,0 +1,42 @@
+# Built application files
+*.apk
+*.ap_
+*.aab
+
+# Java class files
+*.class
+
+# Generated files
+bin/
+gen/
+
+local.properties
+
+*.log
+
+# Android Studio
+*.iml
+.idea
+.idea/workspace.xml
+.gradle
+.navigation
+captures/
+output.json
+
+# Gradle wrapper
+gradle/wrapper/gradle-wrapper.jar
+gradle/wrapper/gradle-wrapper.properties
+
+
+*.jks
+
+.DS_Store
+
+/app/build
+/app/debug
+/app/release
+/captures
+.externalNativeBuild
+.cxx
+
+app/proguard-rules.pro
