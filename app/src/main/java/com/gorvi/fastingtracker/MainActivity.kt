@@ -1,21 +1,30 @@
 package com.gorvi.fastingtracker
 
-import androidx.appcompat.app.AppCompatActivity
-import android.widget.ArrayAdapter
+import android.app.AlertDialog
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.os.Bundle
+import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ListView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-
 import kotlinx.coroutines.launch
-import java.lang.RuntimeException
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 import java.util.*
 
-class MainActivity : AppCompatActivity() {
+
+class MainActivity : AppCompatActivity(), DateTimeDialogCallback {
     private lateinit var buttonStartFasting: Button
     private lateinit var buttonEndFasting: Button
     private lateinit var listView: ListView
@@ -24,20 +33,26 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var fastingRecordRepository: FastingRecordRepository
 
+    private lateinit var defaultDate: LocalDate
+    private lateinit var defaultTime: LocalTime
+    private lateinit var dateFormatter: DateTimeFormatter
+    private lateinit var timeFormatter: DateTimeFormatter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // START REPOSITORY USE
         // Create an instance of the repository
         val fastingRecordDao = AppDatabase.getInstance(applicationContext).fastingRecordDao()
         fastingRecordRepository = FastingRecordRepository(fastingRecordDao)
 
         // buttons
         buttonStartFasting = findViewById(R.id.buttonStartFasting)
-        buttonStartFasting.setOnClickListener(View.OnClickListener { startFasting() })
         buttonEndFasting = findViewById(R.id.buttonEndFasting)
-        buttonEndFasting.setOnClickListener(View.OnClickListener { endFasting() })
+
+        // for date and time picker
+        dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
+        timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
         // list
         listView = findViewById<ListView>(R.id.listViewFastingRecords)
@@ -52,9 +67,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun startFasting() {
+    private fun startFasting(startTime: LocalDateTime) {
         GlobalScope.launch(Dispatchers.Main) {
-            var fastingRecord = FastingRecord(LocalDateTime.now(), null)
+            var fastingRecord = FastingRecord(startTime, null)
             fastingRecordRepository.insertFastingRecord(fastingRecord)
 
             refreshFastingRecords()
@@ -62,8 +77,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun endFasting() {
-        val endTime = LocalDateTime.now()
+    private fun endFasting(endTime: LocalDateTime) {
         GlobalScope.launch(Dispatchers.Main) {
             var fastingRecord = fastingRecordRepository.getOngoingFastingRecord()
             if (fastingRecord == null) {
@@ -97,6 +111,92 @@ class MainActivity : AppCompatActivity() {
                 list.add(recordString)
             }
             adapter.notifyDataSetChanged()
+        }
+    }
+
+    fun showDateTimeDialog(view: View) {
+        val dialogBuilder = AlertDialog.Builder(this)
+        val inflater = LayoutInflater.from(this)
+        val dialogView = inflater.inflate(R.layout.datetime_dialog_layout, null)
+        dialogBuilder.setView(dialogView)
+
+        val dateField = dialogView.findViewById<EditText>(R.id.dateField)
+        val timeField = dialogView.findViewById<EditText>(R.id.timeField)
+
+        // Set current date and time as defaults for the dialog
+        defaultDate = LocalDate.now()
+        defaultTime = LocalTime.now()
+        dateField.setText(defaultDate.format(dateFormatter))
+        timeField.setText(defaultTime.format(timeFormatter))
+
+        // Date field click listener
+        dateField.setOnClickListener {
+            showDatePicker(dateField)
+        }
+
+        // Time field click listener
+        timeField.setOnClickListener {
+            showTimePicker(timeField)
+        }
+
+        dialogBuilder.setTitle(R.string.select_date_and_time)
+
+        dialogBuilder.setPositiveButton("OK") { dialog, _ ->
+            val selectedDate = dateField.text.toString()
+            val selectedTime = timeField.text.toString()
+            (this as? DateTimeDialogCallback)?.onOkButtonClicked(selectedDate, selectedTime, view)
+        }
+
+        dialogBuilder.setNegativeButton("Cancel") { dialog, _ ->
+            dialog.dismiss()
+        }
+
+        val alertDialog = dialogBuilder.create()
+        alertDialog.show()
+    }
+
+    private fun showDatePicker(dateField: EditText) {
+        val datePickerDialog = DatePickerDialog(
+            this,
+            DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
+                val pickedDate = LocalDate.of(year, month, dayOfMonth)
+//                calendar.set(year, month, dayOfMonth)
+                dateField.setText(dateFormatter.format(pickedDate))
+            },
+            defaultDate.year,
+            defaultDate.monthValue,
+            defaultDate.dayOfMonth
+        )
+        datePickerDialog.show()
+    }
+
+    private fun showTimePicker(timeField: EditText) {
+        val timePickerDialog = TimePickerDialog(
+            this,
+            TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
+                val pickedTime = LocalTime.of(hourOfDay, minute)
+                timeField.setText(timeFormatter.format(pickedTime))
+            },
+            defaultTime.hour,
+            defaultTime.minute,
+            true
+        )
+        timePickerDialog.show()
+    }
+
+    override fun onOkButtonClicked(selectedDate: String, selectedTime: String, view: View) {
+        var selectedDateTime = LocalDateTime.of(LocalDate.parse(selectedDate, dateFormatter), LocalTime.parse(selectedTime, timeFormatter))
+
+        when (view) {
+            buttonStartFasting -> {
+                // Handle "start fasting" button click
+                Log.i("MA", "start")
+                startFasting(selectedDateTime)
+            }
+            buttonEndFasting -> {
+                // Handle "end fasting" button click
+                endFasting(selectedDateTime)
+            }
         }
     }
 }

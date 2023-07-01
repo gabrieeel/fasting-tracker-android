@@ -1,0 +1,25 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/dateField"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/select_date"
+        android:inputType="date"
+        android:focusable="false"
+        android:clickable="true" />
+
+    <EditText
+        android:id="@+id/timeField"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/select_time"
+        android:inputType="time"
+        android:focusable="false"
+        android:clickable="true" />
+
+</LinearLayout>

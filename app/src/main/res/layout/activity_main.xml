@@ -12,13 +12,15 @@
         android:id="@+id/buttonStartFasting"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Start Fasting" />
+        android:text="@string/start_fasting"
+        android:onClick="showDateTimeDialog" />
 
     <Button
         android:id="@+id/buttonEndFasting"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="End Fasting" />
+        android:text="@string/end_fasting"
+        android:onClick="showDateTimeDialog" />
 
     <ListView
         android:id="@+id/listViewFastingRecords"
