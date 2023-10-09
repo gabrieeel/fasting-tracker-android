@@ -1,6 +1,7 @@
 package com.gorvi.fastingtracker;
 
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
@@ -14,6 +15,9 @@ public interface FastingRecordDao {
 
     @Update
     void updateFastingRecord(FastingRecord fastingRecord);
+
+    @Delete
+    void deleteFastingRecord(FastingRecord fastingRecord);
 
     @Query("SELECT * FROM fasting_records ORDER BY id DESC LIMIT :count")
     List<FastingRecord> getLastNFastingRecords(int count);

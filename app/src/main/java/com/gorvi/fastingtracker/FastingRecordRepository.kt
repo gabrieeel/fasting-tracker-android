@@ -24,6 +24,12 @@ class FastingRecordRepository(private val fastingRecordDao: FastingRecordDao) {
         }
     }
 
+    suspend fun deleteFastingRecord(fastingRecord: FastingRecord) {
+        withContext(Dispatchers.IO) {
+            fastingRecordDao.deleteFastingRecord(fastingRecord)
+        }
+    }
+
     suspend fun getOngoingFastingRecord(): FastingRecord? {
         return withContext(Dispatchers.IO) {
             fastingRecordDao.getOngoingFastingRecord();
