@@ -159,12 +159,12 @@ class MainActivity : AppCompatActivity(), DateTimeDialogCallback {
         val datePickerDialog = DatePickerDialog(
             this,
             DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
-                val pickedDate = LocalDate.of(year, month, dayOfMonth)
+                val pickedDate = LocalDate.of(year, month + 1, dayOfMonth)
 //                calendar.set(year, month, dayOfMonth)
                 dateField.setText(dateFormatter.format(pickedDate))
             },
             defaultDate.year,
-            defaultDate.monthValue,
+            defaultDate.monthValue - 1,
             defaultDate.dayOfMonth
         )
         datePickerDialog.show()
