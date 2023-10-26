@@ -28,8 +28,8 @@ class MainActivity : AppCompatActivity(), DateTimeDialogCallback {
     private lateinit var buttonStartFasting: Button
     private lateinit var buttonEndFasting: Button
     private lateinit var listView: ListView
-    private val list: ArrayList<String> = ArrayList()
-    private lateinit var adapter: ArrayAdapter<String>
+    private val list: ArrayList<FastingRecord> = ArrayList()
+    private lateinit var adapter: ArrayAdapter<FastingRecord>
 
     private lateinit var fastingRecordRepository: FastingRecordRepository
 
@@ -62,8 +62,7 @@ class MainActivity : AppCompatActivity(), DateTimeDialogCallback {
         refreshFastingRecords()
 
         lifecycleScope.launch() {
-            val isFasting = (fastingRecordRepository.getOngoingFastingRecord() != null)
-            updateButtonVisibility(isFasting)
+            updateButtonVisibility()
         }
     }
 
@@ -73,7 +72,7 @@ class MainActivity : AppCompatActivity(), DateTimeDialogCallback {
             fastingRecordRepository.insertFastingRecord(fastingRecord)
 
             refreshFastingRecords()
-            updateButtonVisibility(true)
+            updateButtonVisibility()
         }
     }
 
@@ -87,11 +86,12 @@ class MainActivity : AppCompatActivity(), DateTimeDialogCallback {
             fastingRecordRepository.updateFastingRecord(fastingRecord);
 
             refreshFastingRecords()
-            updateButtonVisibility(false)
+            updateButtonVisibility()
         }
     }
 
-    private fun updateButtonVisibility(isFasting: Boolean) {
+    private suspend fun updateButtonVisibility() {
+        val isFasting = (fastingRecordRepository.getOngoingFastingRecord() != null)
         if (isFasting) {
             buttonStartFasting!!.visibility = View.GONE
             buttonEndFasting!!.visibility = View.VISIBLE
@@ -108,7 +108,7 @@ class MainActivity : AppCompatActivity(), DateTimeDialogCallback {
             for (fastingRecord in fastingRecords) {
                 val recordString = "Start Time: ${fastingRecord.startTime}\n" +
                         "End Time: ${fastingRecord.endTime}"
-                list.add(recordString)
+                list.add(fastingRecord)
             }
             adapter.notifyDataSetChanged()
         }
