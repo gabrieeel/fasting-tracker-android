@@ -7,10 +7,12 @@ import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.AdapterView.OnItemLongClickListener
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ListView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
@@ -58,6 +60,33 @@ class MainActivity : AppCompatActivity(), DateTimeDialogCallback {
         listView = findViewById<ListView>(R.id.listViewFastingRecords)
         adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, list)
         listView.adapter = adapter
+
+        // Setting the OnItemLongClickListener to the ListView
+        listView.onItemLongClickListener =
+            OnItemLongClickListener { _, _, position, _ ->
+                val builder = AlertDialog.Builder(this)
+                builder.setTitle("Delete Confirmation")
+                    .setMessage("Are you sure you want to delete this item?")
+                    .setPositiveButton("Yes") { _, _ ->
+                        GlobalScope.launch(Dispatchers.Main) {
+                            var fastingRecord = list[position]
+                            fastingRecordRepository.deleteFastingRecord(fastingRecord);
+                            refreshFastingRecords()
+                            updateButtonVisibility()
+                        }
+                        Toast.makeText(
+                            applicationContext,
+                            "Item deleted",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    .setNegativeButton("No") { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                builder.create().show()
+                // Return true to indicate that the long press was consumed
+                true
+            }
 
         refreshFastingRecords()
 
