@@ -1,4 +1,4 @@
-package com.gorvi.fastingtracker
+package com.gorvi.fastingtracker.data
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

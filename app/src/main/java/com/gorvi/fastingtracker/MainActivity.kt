@@ -15,6 +15,9 @@ import android.widget.ListView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.gorvi.fastingtracker.data.AppDatabase
+import com.gorvi.fastingtracker.data.FastingRecord
+import com.gorvi.fastingtracker.data.FastingRecordRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -59,6 +62,7 @@ class MainActivity : AppCompatActivity(), DateTimeDialogCallback {
         // list
         listView = findViewById<ListView>(R.id.listViewFastingRecords)
         adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, list)
+//        adapter = FastingRecordAdapter(this, list)
         listView.adapter = adapter
 
         // Setting the OnItemLongClickListener to the ListView
@@ -111,10 +115,13 @@ class MainActivity : AppCompatActivity(), DateTimeDialogCallback {
             if (fastingRecord == null) {
                 throw RuntimeException("shouldnt be able to update")
             }
+            // TODO revisar
             fastingRecord?.endTime = endTime
             fastingRecordRepository.updateFastingRecord(fastingRecord);
 
             refreshFastingRecords()
+            var fastingDuration = fastingRecord.duration()
+            Toast.makeText(applicationContext,"You've fasted for ${fastingDuration.toHoursPart()} hours and ${fastingDuration.toMinutesPart()} minutes", Toast.LENGTH_SHORT).show()
             updateButtonVisibility()
         }
     }

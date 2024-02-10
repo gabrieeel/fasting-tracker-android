@@ -1,4 +1,4 @@
-package com.gorvi.fastingtracker;
+package com.gorvi.fastingtracker.data;
 
 import androidx.room.Dao;
 import androidx.room.Delete;

@@ -1,4 +1,4 @@
-package com.gorvi.fastingtracker
+package com.gorvi.fastingtracker.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -15,8 +15,11 @@ class FastingRecord(var startTime: LocalDateTime, var endTime: LocalDateTime?) {
 
 
     override fun toString(): String {
-        return "Start Time: ${this.startTime}\n" +
-                "End Time: ${this.endTime}\n" +
-                "Duration: ${this.duration().toString().substring(2)}"
+        var s = "Start Time: ${this.startTime}" +
+                "\nEnd Time: ${this.endTime}"
+        if (this.duration().isZero) {
+            return s
+        }
+        return s + "\nDuration: ${this.duration().toString().substring(2)}"
     }
 }

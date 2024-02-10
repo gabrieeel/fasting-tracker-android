@@ -1,4 +1,4 @@
-package com.gorvi.fastingtracker;
+package com.gorvi.fastingtracker.data;
 
 import android.content.Context;
 
@@ -6,6 +6,8 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
+
+import com.gorvi.fastingtracker.Converters;
 
 @Database(entities = {FastingRecord.class}, version = 1)
 @TypeConverters(Converters.class)
